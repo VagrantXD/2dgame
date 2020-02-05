@@ -14,6 +14,11 @@ class TiledMap : public cocos2d::Node {
     public:
         const cocos2d::Vec2 getMapSize() { return cocos2d::Vec2(width, height); }
         const cocos2d::Vec2 getTileSize() { return cocos2d::Vec2(tilewidth, tileheight); }
+        float getSizeX() { return width * tilewidth; }
+        float getSizeY() { return height * tileheight; }
+
+        const cocos2d::Rect getVisibleArea() { return visibleArea; }
+        bool isVisibleAreaLoading() { return !visibleArea.equals( cocos2d::Rect::ZERO ); }
 
     public:
         static TiledMap *create(const std::string &tmxFileName);
@@ -37,18 +42,26 @@ class TiledMap : public cocos2d::Node {
         // Загрузка карты с обязательными параметрами
         void loadMapUsingSettings();
 
+        // методы для инициализации карты
         int **csvParse(const char *csv);
         const cocos2d::Rect textureRect(int gid);
 
+        // методы для работы с файловыми путями
         std::string parentPath(const std::string &path);
         std::string removeExtension(const std::string &path);
 
-    private:
+        // методы для поиска объектов в objects
+        tinyxml2::XMLElement *findObject(const std::string &name);
+
+    private:    // Для свойств
         int width;
         int height;
         int tilewidth;
         int tileheight;
 
+        cocos2d::Rect visibleArea;
+ 
+    private:     // Для внутреннего использования
         struct Tileset {
             std::string source;
             int width;

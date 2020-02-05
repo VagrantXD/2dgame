@@ -17,19 +17,49 @@ TiledMap *TiledMap::create(const std::string &tmxFileName) {
 }
 
 bool TiledMap::loadObjects() {
+    auto objectgroup_element = doc->FirstChildElement("map")->FirstChildElement("objectgroup");;
+    if(!objectgroup_element) 
+        return false;
 
-    return false;
+    while(objectgroup_element) {
+        auto object_element = objectgroup_element->FirstChildElement(); 
+
+        while(object_element) {
+            objects.push_back(object_element); 
+
+            object_element = object_element->NextSiblingElement();
+        }
+         
+        objectgroup_element = objectgroup_element->NextSiblingElement();
+    }
+
+    return true;
 }
 
 bool TiledMap::loadVisibleArea() {
-  //  auto objectGroup = FirstChildElement("map")->FirstChildElement("objectgroup");
-   // if(!objectGroup) return false;
-   // auto object = FirstChildElement("
-   //
-   return false;
+    XMLElement *visiblearea_element = findObject("visible_area");
+
+    if(visiblearea_element == nullptr)
+        return false;
+
+    float x = visiblearea_element->DoubleAttribute("x");
+    float y = visiblearea_element->DoubleAttribute("y");
+    float width = visiblearea_element->DoubleAttribute("width");
+    float height = visiblearea_element->DoubleAttribute("height");
+
+    float transformY = getSizeY() - (height + y);
+
+    visibleArea.setRect(x, transformY, width, height);
+
+    if( visibleArea.equals( Rect::ZERO ) )
+        return false;
+
+    return true;
 }
 
-TiledMap::TiledMap() {
+TiledMap::TiledMap() 
+    : visibleArea( Rect::ZERO )
+{
 
 }
 
@@ -103,7 +133,7 @@ void TiledMap::loadMapUsingSettings() {
             if( gid != 0 ) {
                 auto sprite = Sprite::createWithTexture( tileset_texture, textureRect(gid) );
                 sprite->setAnchorPoint( Vec2(0, 0) );
-                sprite->setPosition( Vec2( i * tilewidth,  (height - j) * tileheight) );  // пререворот карты
+                sprite->setPosition( Vec2( i * tilewidth,  (height - j - 1) * tileheight) );  // пререворот карты
 
                 addChild(sprite);
 
@@ -162,4 +192,19 @@ std::string TiledMap::parentPath(const std::string &path) {
 std::string TiledMap::removeExtension(const std::string &path) {
     int pos = path.find_last_of(".");
     return path.substr(0, pos);
+}
+
+XMLElement *TiledMap::findObject(const std::string &name) {
+    for( auto &object : objects ) {
+        auto name_attribute = object->FindAttribute("name");
+        if(!name_attribute)
+            return nullptr;
+
+        std::string attributeName = name_attribute->Value();
+        if(attributeName == name) {
+            return object;
+        }
+    }
+
+    return nullptr;
 }
