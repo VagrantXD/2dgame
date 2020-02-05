@@ -1,0 +1,165 @@
+/* tiledmap.cpp */
+
+#include <iostream>
+
+#include "tiledmap.h"
+
+using namespace tinyxml2;
+
+USING_NS_CC;
+
+
+TiledMap *TiledMap::create(const std::string &tmxFileName) {
+    TiledMap *ret = new TiledMap();
+    ret->initWithFileName(tmxFileName);
+    ret->autorelease();
+    return ret;
+}
+
+bool TiledMap::loadObjects() {
+
+    return false;
+}
+
+bool TiledMap::loadVisibleArea() {
+  //  auto objectGroup = FirstChildElement("map")->FirstChildElement("objectgroup");
+   // if(!objectGroup) return false;
+   // auto object = FirstChildElement("
+   //
+   return false;
+}
+
+TiledMap::TiledMap() {
+
+}
+
+TiledMap::~TiledMap() {
+    delete doc;
+}
+
+void TiledMap::initWithFileName(const std::string &tmxFileName) {
+    tmxPath = FileUtils::getInstance()->fullPathForFilename(tmxFileName);
+
+    doc = new tinyxml2::XMLDocument;
+
+        if( doc->LoadFile(tmxPath.c_str()) )
+            ; // исключение
+
+    loadMapSettings();
+    loadTilesetSettings();
+    loadLayersSettings();
+
+    loadMapUsingSettings();
+}
+
+void TiledMap::loadMapSettings() {
+    XMLElement *map_element = doc->FirstChildElement("map");
+
+    width = map_element->IntAttribute("width");
+    height = map_element->IntAttribute("height");
+    tilewidth = map_element->IntAttribute("tilewidth");
+    tileheight = map_element->IntAttribute("tileheight");
+}
+
+void TiledMap::loadTilesetSettings() {
+    XMLElement *tileset_element = doc->FirstChildElement("map")->FirstChildElement("tileset");
+    std::string tileset_source = tileset_element->Attribute("source"); 
+
+    XMLDocument *tilesetDocument = new XMLDocument;
+
+    if( tilesetDocument->LoadFile( (parentPath(tmxPath) + "/" + tileset_source).c_str() ) )
+        std::cout << tmxPath + "/" + tileset_source << std::endl; // тсключение
+
+    auto tsx_tileset_element = tilesetDocument->FirstChildElement("tileset");
+
+    auto image_element = tsx_tileset_element->FirstChildElement("image");
+
+    tileset.source = image_element->Attribute("source");
+    tileset.width = image_element->IntAttribute("width");
+    tileset.height = image_element->IntAttribute("height");
+
+    delete tilesetDocument;
+}
+
+void TiledMap::loadLayersSettings() {
+    XMLElement *layer = doc->FirstChildElement("map")->FirstChildElement("layer"); 
+    XMLElement *data = layer->FirstChildElement("data");
+
+    this->layer.name = layer->Attribute("name");
+    const char *csv = data->GetText();
+    this->layer.sheet = csvParse(csv);
+}
+
+void TiledMap::loadMapUsingSettings() {
+    std::string parentDirectoryPath = parentPath(tmxPath);
+    std::string tilesetPath = parentDirectoryPath + "/" + tileset.source;
+
+    auto texture_cache = Director::getInstance()->getTextureCache();
+    auto tileset_texture = texture_cache->addImage( tilesetPath );
+
+    for(int i = 0; i < width; ++i) {
+        for(int j = 0; j < height; ++j) {
+            int gid = layer.sheet[j][i];
+            if( gid != 0 ) {
+                auto sprite = Sprite::createWithTexture( tileset_texture, textureRect(gid) );
+                sprite->setAnchorPoint( Vec2(0, 0) );
+                sprite->setPosition( Vec2( i * tilewidth,  (height - j) * tileheight) );  // пререворот карты
+
+                addChild(sprite);
+
+                layer.sprites.push_back( sprite );
+            }
+        }
+    }
+
+}
+
+int **TiledMap::csvParse(const char *csv) {
+    int **result = new int *[height];
+    for(int i = 0; i < height; ++i)
+        result[i] = new int[width];
+
+    int count = 0;
+    std::string number;
+    
+    while(*csv) {
+        if( isdigit(*csv) ) {
+            number.push_back(*csv);
+        } else {
+            if( !number.empty() ) {
+                result[ count / width ][ count % width ] = std::stoi(number);
+                count++;
+                number.clear();
+            }
+        }
+            
+        csv++;
+    }
+    
+    return result;
+}
+
+const Rect TiledMap::textureRect(int gid) {
+    int width_texture_count = tileset.width / tilewidth;
+    int height_texture_count = tileset.height / tileheight;
+
+    gid--;
+
+    int row = gid / width_texture_count;
+    int col = gid % width_texture_count;
+
+    int start_x = col * tilewidth;
+    int start_y = row * tileheight;
+
+    return Rect(start_x, start_y, tilewidth, tileheight);
+} 
+
+std::string TiledMap::parentPath(const std::string &path) {
+    int pos = path.find_last_of("/");
+    return path.substr(0, pos);
+}
+
+std::string TiledMap::removeExtension(const std::string &path) {
+    int pos = path.find_last_of(".");
+    return path.substr(0, pos);
+}
