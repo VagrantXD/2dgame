@@ -17,11 +17,9 @@ class TiledMap : public cocos2d::Node {
         float getSizeY() { return height * tileheight; }
 
         const cocos2d::Rect getVisibleArea() { return visibleArea; }
-        bool isVisibleArea() { return !visibleArea.equals( cocos2d::Rect::ZERO ); }
+        bool isVisibleAreaLoading() { return !visibleArea.equals( cocos2d::Rect::ZERO ); }
         
-        const cocos2d::Vec2 *getMapBody() { return mapBody.points; }
-        int getMapBodySize() { return mapBody.size; }
-        const cocos2d::Vec2 getMapBodyOffset() { return cocos2d::Vec2(mapBody.xOffset, mapBody.yOffset); }
+        const MapBody getMapBody();
         
     public:
         static TiledMap *create(const std::string &tmxFileName);
@@ -30,8 +28,7 @@ class TiledMap : public cocos2d::Node {
         //
         bool loadObjects();
         bool loadVisibleArea();
-        bool loadMapBody();
-         
+
 
     private:
         TiledMap();
@@ -50,7 +47,6 @@ class TiledMap : public cocos2d::Node {
         // Парсинг и прочии вспомогательные функции
         int **csvParse(const char *csv);
         const cocos2d::Rect textureRect(int gid);
-        void polygonParse(const std::string &polygonStr);
 
         // методы для работы с файловыми путями
         std::string parentPath(const std::string &path);
@@ -80,12 +76,6 @@ class TiledMap : public cocos2d::Node {
             std::vector< cocos2d::Sprite * > sprites;
         } layer;
 
-        struct MapBody {
-            cocos2d::Vec2 *points;
-            int size;
-            float xOffset;
-            float yOffset;
-        } mapBody;
 
         tinyxml2::XMLDocument *doc;
         std::vector< tinyxml2::XMLElement *> objects;

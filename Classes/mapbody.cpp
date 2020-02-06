@@ -1,5 +1,7 @@
 /* mapbody.cpp */
 
+#include <iostream>
+
 #include "mapbody.h"
 
 namespace xml = tinyxml2;
@@ -12,6 +14,25 @@ MapBody::MapBody(xml::XMLElement *mapbody_element)
      isload(false)
 {
     loadMapBody(mapbody_element);
+}
+
+void MapBody::transformMapBody(int mapHeight) {
+    float height = 0.0f; 
+
+    if(!isLoad()) return;
+
+    for(int i = 0; i < size; ++i) {
+        std::cout << std::endl << points[i].x << " " << points[i].y << std::endl;
+        if(points[i].y > height) {
+            height = points[i].y;
+        }
+    }
+
+    yOffset = mapHeight - yOffset - height;
+
+    for(int i = 0; i < size; ++i) {
+      points[i].y = height - points[i].y;
+    }
 }
 
 void MapBody::loadMapBody(xml::XMLElement *mapbody_element) {
