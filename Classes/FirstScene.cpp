@@ -36,47 +36,41 @@ bool FirstScene::init()
 
     /////////////////////////////////////////////////////////////////////////
 
-    tm = TiledMap::create("map/map.tmx");
+    tm = TiledMap::create("map3/map.tmx");
 
     tm->loadObjects();
+
+
+
+    tm->loadVisibleArea();
+
+    if( tm->isVisibleAreaLoading() ) {
+        auto r = tm->getVisibleArea();
+
+        float scale = visibleSize.height / r.size.height;
+        //std::cout << std::endl << scale << std::endl;
+        tm->setScale(scale);
+
+        tm->setPosition( -r.origin * tm->getScale() );
+    }
+
 
     auto mb = tm->getMapBody();
 
     if(mb.isLoad()) {
         auto physics = PhysicsBody::createEdgePolygon( mb.getPolygon(), mb.getSize() );
-        physics->setPositionOffset( mb.getOffset() );
+        physics->setPositionOffset( mb.getOffset() * tm->getScale() );
         tm->setPhysicsBody( physics );
     } else {
         std::cout << std::endl << "Map body not loading" << std::endl;
     }
 
-    
-    //auto tm->loadMapBody
 
-    /*tm->loadMapBody();
-    auto x = tm->getMapBody();
-    int size = tm->getMapBodySize();
 
-    auto physics = PhysicsBody::createEdgePolygon(x, size);
-    physics->setPositionOffset( tm->getMapBodyOffset() );
-    tm->setPhysicsBody( physics );
 
-    //auto physics = PhysicsBody::createEdgePolygon(x, size);
-    //tm->setPhysicsBody( physics );*/
 
-    /*std::cout << std::endl << tm->loadVisibleArea() << std::endl;
 
-    auto r = tm->getVisibleArea();
-
-    std::cout << tm->isVisibleAreaLoading() << " : " << r.getMinX() << " " 
-        << r.getMinY() << " " << r.getMaxX() << " " << r.getMaxY() << std::endl;
-
-    float scale = visibleSize.height / r.size.height;
-    tm->setScale(scale);
-
-    tm->setPosition( -r.origin * tm->getScale() );
-*/
-    addChild(tm, 100);
+    addChild(tm, 50);
 
     ///////////////////////////////////
     
@@ -196,6 +190,7 @@ void FirstScene::drawTrampoline() {
 
     /////////////////////////////////////////////
     hero = Sprite::create("dv.png"); 
+    //hero->setScale(0.1);
     body = PhysicsBody::createBox( Size(200, 200) );
     body->addMass(80);
     body->setContactTestBitmask(0x1);
@@ -204,7 +199,7 @@ void FirstScene::drawTrampoline() {
     hero->setPhysicsBody(body);
     //hero->setRotation(180);
     hero->setFlippedX(true);
-    addChild(hero);
+    addChild(hero, 1000);
 
     auto shturm = Sprite::create("shturm.png");
     auto body2 = PhysicsBody::createBox( Size(1000, 30) );

@@ -22,7 +22,6 @@ void MapBody::transformMapBody(int mapHeight) {
     if(!isLoad()) return;
 
     for(int i = 0; i < size; ++i) {
-        std::cout << std::endl << points[i].x << " " << points[i].y << std::endl;
         if(points[i].y > height) {
             height = points[i].y;
         }
