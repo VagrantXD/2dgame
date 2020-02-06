@@ -57,6 +57,28 @@ bool TiledMap::loadVisibleArea() {
     return true;
 }
 
+bool TiledMap::loadMapBody() {
+    XMLElement *mapbody_element = findObject("map_body");
+
+    if(mapbody_element == nullptr)
+        return false;
+    
+    mapBody.xOffset = mapbody_element->FloatAttribute("x");
+    mapBody.yOffset = mapbody_element->FloatAttribute("y");
+
+    mapbody_element = mapbody_element->FirstChildElement("polygon");
+
+    if(mapbody_element == nullptr)
+        return false;
+
+    // Потенциально опасное место
+    std::string polygonStr = mapbody_element->Attribute("points");
+     
+    polygonParse(polygonStr);
+
+    return true;
+}
+
 TiledMap::TiledMap() 
     : visibleArea( Rect::ZERO )
 {
@@ -65,6 +87,7 @@ TiledMap::TiledMap()
 
 TiledMap::~TiledMap() {
     delete doc;
+  //  delete [] mapBody.points;
 }
 
 void TiledMap::initWithFileName(const std::string &tmxFileName) {
@@ -183,6 +206,29 @@ const Rect TiledMap::textureRect(int gid) {
 
     return Rect(start_x, start_y, tilewidth, tileheight);
 } 
+
+void TiledMap::polygonParse(const std::string &polygonStr) {
+    int start = 0;
+    int pos = 0; 
+    
+    std::vector< float > n;
+
+    while( ( pos = polygonStr.find_first_of(" ,", pos + 1) ) != std::string::npos ) {
+        n.push_back( std::stof(polygonStr.substr(start, pos - start)) );
+        start = pos + 1;
+    }
+
+    n.push_back( std::stof(polygonStr.substr(start)) );
+
+    mapBody.points = new Vec2[ n.size() / 2 ];
+    mapBody.size = n.size() / 2;
+
+    for(int i = 0; i < n.size(); ++i)
+        if(i % 2 == 0)
+            mapBody.points[i / 2].x = n[i];
+        else
+            mapBody.points[i / 2].y = n[i];
+}
 
 std::string TiledMap::parentPath(const std::string &path) {
     int pos = path.find_last_of("/");
