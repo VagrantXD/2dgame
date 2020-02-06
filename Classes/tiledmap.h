@@ -5,8 +5,7 @@
 
 #include <string>
 
-#include "cocos2d.h"
-#include "tinyxml2/tinyxml2.h"
+#include "mapbody.h"
 
 class TiledMap : public cocos2d::Node {
 
