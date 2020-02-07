@@ -43,18 +43,18 @@ bool FirstScene::init()
 
 
 
-  /*  tm->loadVisibleArea();
+    tm->loadVisibleArea();
 
     if( tm->isVisibleAreaLoading() ) {
         auto r = tm->getVisibleArea();
 
         float scale = visibleSize.height / r.size.height;
-        //std::cout << std::endl << scale << std::endl;
+
         tm->setScale(scale);
 
         tm->setPosition( -r.origin * tm->getScale() );
     }
-*/
+
 
     auto mb = tm->getMapBody();
 

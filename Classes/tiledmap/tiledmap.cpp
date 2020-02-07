@@ -117,16 +117,26 @@ void TiledMap::loadTilesetSettings() {
 
 void TiledMap::loadLayersSettings() {
     XMLElement *layer_element = doc->FirstChildElement("map")->FirstChildElement("layer");
-    layer = Layer::create(layer_element); 
 
-    if( layer->isLoading() ) {
-        layer->createSpritesLayer(tileset);
-
-        addChild(layer);
-
+    if(layer_element == nullptr) {
+        ; // Что сделать?
     }
-    else {
-        ;    // Что сделать?
+
+
+    while(layer_element) {
+        auto layer = Layer::create(layer_element); 
+
+        if( layer->isLoading() ) {
+            layer->createSpritesLayer(tileset);
+
+            addChild(layer);
+
+        }
+        else {
+            ;    // Что сделать?
+        }
+
+        layer_element = layer_element->NextSiblingElement();
     }
 }
 
