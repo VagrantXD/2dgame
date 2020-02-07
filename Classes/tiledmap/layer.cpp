@@ -4,6 +4,12 @@
 
 namespace xml = tinyxml2;
 
+Layer *Layer::create(xml::XMLElement *layer_element) {
+    Layer *ret = new Layer(layer_element); 
+    ret->autorelease();
+    return ret;
+}
+
 Layer::Layer(xml::XMLElement *layer_element)
     :isloading(false),
      name(""),
@@ -19,6 +25,23 @@ Layer::~Layer() {
         delete [] sheet[i];
     delete [] sheet;
 }
+
+/*void Layer::createSpritesLayer(const std::string &textureName) {
+    for(int i = 0; i < width; ++i) {
+        for(int j = 0; j < height; ++j) {
+            int gid = sheet[j][i];
+            if( gid != 0 ) {
+                auto sprite = cocos2d::Sprite::createWithTexture( tileset_texture, textureRect(gid) );
+                sprite->setAnchorPoint( cocos2d::Vec2(0, 0) );
+                sprite->setPosition( cocos2d::Vec2( i * tilewidth,  (layer->getHeight() - j - 1) * tileheight) );// пререворот карты
+
+                addChild(sprite);
+
+                //sprites.push_back( sprite );
+            }
+        }
+    }
+}*/
 
 void Layer::loadLayer(xml::XMLElement *layer_element) {
     if(layer_element == nullptr) {
@@ -70,4 +93,3 @@ int **Layer::csvParse(const char *csv) {
     
     return result;
 }
-

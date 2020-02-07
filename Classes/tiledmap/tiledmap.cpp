@@ -8,8 +8,6 @@
 
 using namespace tinyxml2;
 
-//USING_NS_CC;
-
 TiledMap *TiledMap::create(const std::string &tmxFileName) {
     TiledMap *ret = new TiledMap();
     ret->initWithFileName(tmxFileName);
@@ -122,15 +120,8 @@ void TiledMap::loadTilesetSettings() {
 }
 
 void TiledMap::loadLayersSettings() {
-/*    XMLElement *layer = doc->FirstChildElement("map")->FirstChildElement("layer"); 
-    XMLElement *data = layer->FirstChildElement("data");
-
-    this->layer.name = layer->Attribute("name");
-    const char *csv = data->GetText();
-    this->layer.sheet = csvParse(csv);*/
-
     XMLElement *layer_element = doc->FirstChildElement("map")->FirstChildElement("layer");
-    layer = new Layer(layer_element); 
+    layer = Layer::create(layer_element); 
 }
 
 void TiledMap::loadMapUsingSettings() {
@@ -156,32 +147,6 @@ void TiledMap::loadMapUsingSettings() {
     }
 
 }
-
-/*
-int **TiledMap::csvParse(const char *csv) {
-    int **result = new int *[height];
-    for(int i = 0; i < height; ++i)
-        result[i] = new int[width];
-
-    int count = 0;
-    std::string number;
-    
-    while(*csv) {
-        if( isdigit(*csv) ) {
-            number.push_back(*csv);
-        } else {
-            if( !number.empty() ) {
-                result[ count / width ][ count % width ] = std::stoi(number);
-                count++;
-                number.clear();
-            }
-        }
-            
-        csv++;
-    }
-    
-    return result;
-} */
 
 const cocos2d::Rect TiledMap::textureRect(int gid) {
     int width_texture_count = tileset.width / tilewidth;

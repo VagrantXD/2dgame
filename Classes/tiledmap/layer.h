@@ -6,7 +6,7 @@
 #include "cocos2d.h"
 #include "../tinyxml2/tinyxml2.h"
 
-class Layer {
+class Layer : cocos2d::Node {
 
     public:
         const std::string &getName() const { return name; }
@@ -18,6 +18,11 @@ class Layer {
         bool isLoading() const { return isloading; }
 
     public:
+        static Layer *create(tinyxml2::XMLElement *layer_element);
+
+        //void createSpritesLayer(const std::string &textureName);
+
+    private:
         Layer(tinyxml2::XMLElement *layer_element);
         ~Layer();
 

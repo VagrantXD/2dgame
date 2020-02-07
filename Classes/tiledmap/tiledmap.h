@@ -72,7 +72,6 @@ class TiledMap : public cocos2d::Node {
         } tileset; 
 
         Layer *layer;
-        //std::vector < cocos2d::Sprite * > sprites;
 
         tinyxml2::XMLDocument *doc;
         std::vector< tinyxml2::XMLElement *> objects;
