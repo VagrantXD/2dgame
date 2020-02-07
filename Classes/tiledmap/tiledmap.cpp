@@ -8,8 +8,7 @@
 
 using namespace tinyxml2;
 
-USING_NS_CC;
-
+//USING_NS_CC;
 
 TiledMap *TiledMap::create(const std::string &tmxFileName) {
     TiledMap *ret = new TiledMap();
@@ -53,7 +52,7 @@ bool TiledMap::loadVisibleArea() {
 
     visibleArea.setRect(x, transformY, width, height);
 
-    if( visibleArea.equals( Rect::ZERO ) )
+    if( visibleArea.equals( cocos2d::Rect::ZERO ) )
         return false;
 
     return true;
@@ -69,7 +68,7 @@ const MapBody TiledMap::getMapBody() {
 }
 
 TiledMap::TiledMap() 
-    : visibleArea( Rect::ZERO )
+    : visibleArea( cocos2d::Rect::ZERO )
 {
 
 }
@@ -79,7 +78,7 @@ TiledMap::~TiledMap() {
 }
 
 void TiledMap::initWithFileName(const std::string &tmxFileName) {
-    tmxPath = FileUtils::getInstance()->fullPathForFilename(tmxFileName);
+    tmxPath = cocos2d::FileUtils::getInstance()->fullPathForFilename(tmxFileName);
 
     doc = new tinyxml2::XMLDocument;
 
@@ -123,38 +122,42 @@ void TiledMap::loadTilesetSettings() {
 }
 
 void TiledMap::loadLayersSettings() {
-    XMLElement *layer = doc->FirstChildElement("map")->FirstChildElement("layer"); 
+/*    XMLElement *layer = doc->FirstChildElement("map")->FirstChildElement("layer"); 
     XMLElement *data = layer->FirstChildElement("data");
 
     this->layer.name = layer->Attribute("name");
     const char *csv = data->GetText();
-    this->layer.sheet = csvParse(csv);
+    this->layer.sheet = csvParse(csv);*/
+
+    XMLElement *layer_element = doc->FirstChildElement("map")->FirstChildElement("layer");
+    layer = new Layer(layer_element); 
 }
 
 void TiledMap::loadMapUsingSettings() {
     std::string parentDirectoryPath = parentPath(tmxPath);
     std::string tilesetPath = parentDirectoryPath + "/" + tileset.source;
 
-    auto texture_cache = Director::getInstance()->getTextureCache();
+    auto texture_cache = cocos2d::Director::getInstance()->getTextureCache();
     auto tileset_texture = texture_cache->addImage( tilesetPath );
 
-    for(int i = 0; i < width; ++i) {
-        for(int j = 0; j < height; ++j) {
-            int gid = layer.sheet[j][i];
+    for(int i = 0; i < layer->getWidth(); ++i) {
+        for(int j = 0; j < layer->getHeight(); ++j) {
+            int gid = layer->getSheet()[j][i];
             if( gid != 0 ) {
-                auto sprite = Sprite::createWithTexture( tileset_texture, textureRect(gid) );
-                sprite->setAnchorPoint( Vec2(0, 0) );
-                sprite->setPosition( Vec2( i * tilewidth,  (height - j - 1) * tileheight) );  // пререворот карты
+                auto sprite = cocos2d::Sprite::createWithTexture( tileset_texture, textureRect(gid) );
+                sprite->setAnchorPoint( cocos2d::Vec2(0, 0) );
+                sprite->setPosition( cocos2d::Vec2( i * tilewidth,  (layer->getHeight() - j - 1) * tileheight) );// пререворот карты
 
                 addChild(sprite);
 
-                layer.sprites.push_back( sprite );
+                //sprites.push_back( sprite );
             }
         }
     }
 
 }
 
+/*
 int **TiledMap::csvParse(const char *csv) {
     int **result = new int *[height];
     for(int i = 0; i < height; ++i)
@@ -178,9 +181,9 @@ int **TiledMap::csvParse(const char *csv) {
     }
     
     return result;
-}
+} */
 
-const Rect TiledMap::textureRect(int gid) {
+const cocos2d::Rect TiledMap::textureRect(int gid) {
     int width_texture_count = tileset.width / tilewidth;
     int height_texture_count = tileset.height / tileheight;
 
@@ -192,7 +195,7 @@ const Rect TiledMap::textureRect(int gid) {
     int start_x = col * tilewidth;
     int start_y = row * tileheight;
 
-    return Rect(start_x, start_y, tilewidth, tileheight);
+    return cocos2d::Rect(start_x, start_y, tilewidth, tileheight);
 } 
 
 std::string TiledMap::parentPath(const std::string &path) {

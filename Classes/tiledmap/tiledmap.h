@@ -6,6 +6,7 @@
 #include <string>
 
 #include "mapbody.h"
+#include "layer.h"
 
 class TiledMap : public cocos2d::Node {
 
@@ -70,12 +71,8 @@ class TiledMap : public cocos2d::Node {
             int height;
         } tileset; 
 
-        struct Layer {
-            std::string name;
-            int **sheet;
-            std::vector< cocos2d::Sprite * > sprites;
-        } layer;
-
+        Layer *layer;
+        //std::vector < cocos2d::Sprite * > sprites;
 
         tinyxml2::XMLDocument *doc;
         std::vector< tinyxml2::XMLElement *> objects;

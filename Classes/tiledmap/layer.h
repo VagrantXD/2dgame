@@ -7,6 +7,16 @@
 #include "../tinyxml2/tinyxml2.h"
 
 class Layer {
+
+    public:
+        const std::string &getName() const { return name; }
+        int getWidth() const { return width; }
+        int getHeight() const { return height; }
+
+        int **getSheet() const { return sheet; }
+
+        bool isLoading() const { return isloading; }
+
     public:
         Layer(tinyxml2::XMLElement *layer_element);
         ~Layer();
