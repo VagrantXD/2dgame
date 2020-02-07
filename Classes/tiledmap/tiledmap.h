@@ -44,13 +44,6 @@ class TiledMap : public cocos2d::Node {
         void loadTilesetSettings();
         void loadLayersSettings();
 
-        // Загрузка карты с обязательными параметрами
-        void loadMapUsingSettings();
-
-        // Парсинг и прочии вспомогательные функции
-        int **csvParse(const char *csv);
-        const cocos2d::Rect textureRect(int gid);
-
         // методы для работы с файловыми путями
         std::string parentPath(const std::string &path);
         std::string removeExtension(const std::string &path);
@@ -67,12 +60,6 @@ class TiledMap : public cocos2d::Node {
         cocos2d::Rect visibleArea;
  
     private:     // Для внутреннего использования
-       /* struct Tileset {
-            std::string source;
-            int width;
-            int height;
-        } tileset; 
-        */
 
         Tileset *tileset;
 

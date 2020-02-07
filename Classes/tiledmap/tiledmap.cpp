@@ -89,7 +89,7 @@ void TiledMap::initWithFileName(const std::string &tmxFileName) {
     loadTilesetSettings();
     loadLayersSettings();
 
-    loadMapUsingSettings();
+    //loadMapUsingSettings();
 }
 
 void TiledMap::loadMapSettings() {
@@ -106,68 +106,29 @@ void TiledMap::loadTilesetSettings() {
 
     tileset = new Tileset( tileset_element, parentPath(tmxPath) );
 
-    /*std::string tileset_source = tileset_element->Attribute("source"); 
-
-    XMLDocument *tilesetDocument = new XMLDocument;
-
-    if( tilesetDocument->LoadFile( (parentPath(tmxPath) + "/" + tileset_source).c_str() ) )
-        std::cout << tmxPath + "/" + tileset_source << std::endl; // тсключение
-
-    auto tsx_tileset_element = tilesetDocument->FirstChildElement("tileset");
-
-    auto image_element = tsx_tileset_element->FirstChildElement("image");
-
-    tileset.source = image_element->Attribute("source");
-    tileset.width = image_element->IntAttribute("width");
-    tileset.height = image_element->IntAttribute("height");
-
-    delete tilesetDocument; 
-    */
+    if( tileset->isLoading() ) {
+        auto texturecache = cocos2d::Director::getInstance()->getTextureCache();
+        texturecache->addImage( tileset->getTextureFilePath() );
+    }
+    else {
+        ;     // Что сделать?
+    }
 }
 
 void TiledMap::loadLayersSettings() {
     XMLElement *layer_element = doc->FirstChildElement("map")->FirstChildElement("layer");
     layer = Layer::create(layer_element); 
-}
 
-void TiledMap::loadMapUsingSettings() {
-    std::string parentDirectoryPath = parentPath(tmxPath);
-    std::string tilesetPath = tileset->getTextureFilePath();
+    if( layer->isLoading() ) {
+        layer->createSpritesLayer(tileset);
 
-    auto texture_cache = cocos2d::Director::getInstance()->getTextureCache();
-    auto tileset_texture = texture_cache->addImage( tilesetPath );
+        addChild(layer);
 
-    for(int i = 0; i < layer->getWidth(); ++i) {
-        for(int j = 0; j < layer->getHeight(); ++j) {
-            int gid = layer->getSheet()[j][i];
-            if( gid != 0 ) {
-                auto sprite = cocos2d::Sprite::createWithTexture( tileset_texture, textureRect(gid) );
-                sprite->setAnchorPoint( cocos2d::Vec2(0, 0) );
-                sprite->setPosition( cocos2d::Vec2( i * tilewidth,  (layer->getHeight() - j - 1) * tileheight) );// пререворот карты
-
-                addChild(sprite);
-
-                //sprites.push_back( sprite );
-            }
-        }
     }
-
+    else {
+        ;    // Что сделать?
+    }
 }
-
-const cocos2d::Rect TiledMap::textureRect(int gid) {
-    int width_texture_count = tileset->getWidth() / tilewidth;
-    int height_texture_count = tileset->getHeight() / tileheight;
-
-    gid--;
-
-    int row = gid / width_texture_count;
-    int col = gid % width_texture_count;
-
-    int start_x = col * tilewidth;
-    int start_y = row * tileheight;
-
-    return cocos2d::Rect(start_x, start_y, tilewidth, tileheight);
-} 
 
 std::string TiledMap::parentPath(const std::string &path) {
     int pos = path.find_last_of("/");

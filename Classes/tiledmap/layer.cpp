@@ -1,6 +1,7 @@
 /* layer.cpp */
 
 #include "layer.h"
+#include "tileset.h"
 
 namespace xml = tinyxml2;
 
@@ -26,14 +27,19 @@ Layer::~Layer() {
     delete [] sheet;
 }
 
-/*void Layer::createSpritesLayer(const std::string &textureName) {
+void Layer::createSpritesLayer(const Tileset *tileset) {
+    auto texturecache = cocos2d::Director::getInstance()->getTextureCache();
+    auto texture = texturecache->getTextureForKey( tileset->getTextureFilePath() );
+
     for(int i = 0; i < width; ++i) {
         for(int j = 0; j < height; ++j) {
             int gid = sheet[j][i];
             if( gid != 0 ) {
-                auto sprite = cocos2d::Sprite::createWithTexture( tileset_texture, textureRect(gid) );
+                ;
+                auto sprite = cocos2d::Sprite::createWithTexture( texture, tileset->textureRect(gid) );
                 sprite->setAnchorPoint( cocos2d::Vec2(0, 0) );
-                sprite->setPosition( cocos2d::Vec2( i * tilewidth,  (layer->getHeight() - j - 1) * tileheight) );// пререворот карты
+                sprite->setPosition( cocos2d::Vec2( i * tileset->getTileWidth(),  
+                            (height - j - 1) * tileset->getTileHeight() ) );// пререворот карты
 
                 addChild(sprite);
 
@@ -41,7 +47,7 @@ Layer::~Layer() {
             }
         }
     }
-}*/
+}
 
 void Layer::loadLayer(xml::XMLElement *layer_element) {
     if(layer_element == nullptr) {
