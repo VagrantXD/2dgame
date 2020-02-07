@@ -9,6 +9,12 @@
 class Layer {
     public:
         Layer(tinyxml2::XMLElement *layer_element);
+        ~Layer();
+
+    private:
+        void loadLayer(tinyxml2::XMLElement *layer_element);
+
+        int **csvParse(const char *csv);
 
     private:
         std::string name;
