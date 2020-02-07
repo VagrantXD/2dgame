@@ -58,7 +58,7 @@ bool FirstScene::init()
 
     auto mb = tm->getMapBody();
 
-    if(mb.isLoad()) {
+    if(mb.isLoading()) {
         auto physics = PhysicsBody::createEdgePolygon( mb.getPolygon(), mb.getSize() );
         physics->setPositionOffset( mb.getOffset() * tm->getScale() );
         tm->setPhysicsBody( physics );

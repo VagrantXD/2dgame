@@ -11,15 +11,19 @@ MapBody::MapBody(xml::XMLElement *mapbody_element)
      size(0), 
      xOffset(0.0f),
      yOffset(0.0f),
-     isload(false)
+     isloading(false)
 {
     loadMapBody(mapbody_element);
+}
+
+MapBody::~MapBody() {
+    delete [] points;
 }
 
 void MapBody::transformMapBody(int mapHeight) {
     float height = 0.0f; 
 
-    if(!isLoad()) return;
+    if(!isLoading()) return;
 
     for(int i = 0; i < size; ++i) {
         if(points[i].y > height) {
@@ -36,7 +40,7 @@ void MapBody::transformMapBody(int mapHeight) {
 
 void MapBody::loadMapBody(xml::XMLElement *mapbody_element) {
     if(mapbody_element == nullptr) {
-        isload = false;
+        isloading = false;
         return;
     }
     
@@ -47,7 +51,7 @@ void MapBody::loadMapBody(xml::XMLElement *mapbody_element) {
     mapbody_element = mapbody_element->FirstChildElement("polygon");
 
     if(mapbody_element == nullptr) {
-        isload = false;
+        isloading = false;
         return;
     }
 
@@ -55,7 +59,7 @@ void MapBody::loadMapBody(xml::XMLElement *mapbody_element) {
     std::string polygonStr = mapbody_element->Attribute("points");
      
     polygonParse(polygonStr);
-    isload = true;
+    isloading = true;
 }
 
 void MapBody::polygonParse(const std::string &polygonStr) {
