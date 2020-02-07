@@ -6,7 +6,9 @@
 #include <string>
 
 #include "mapbody.h"
-#include "layer.h"
+
+class Layer;
+class Tileset;
 
 class TiledMap : public cocos2d::Node {
 
@@ -65,11 +67,14 @@ class TiledMap : public cocos2d::Node {
         cocos2d::Rect visibleArea;
  
     private:     // Для внутреннего использования
-        struct Tileset {
+       /* struct Tileset {
             std::string source;
             int width;
             int height;
         } tileset; 
+        */
+
+        Tileset *tileset;
 
         Layer *layer;
 

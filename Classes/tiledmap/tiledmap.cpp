@@ -3,8 +3,9 @@
 #include <iostream>
 
 #include "tiledmap.h"
-
 #include "layer.h"
+#include "tileset.h"
+
 
 using namespace tinyxml2;
 
@@ -73,6 +74,7 @@ TiledMap::TiledMap()
 
 TiledMap::~TiledMap() {
     delete doc;
+    delete tileset;
 }
 
 void TiledMap::initWithFileName(const std::string &tmxFileName) {
@@ -101,7 +103,10 @@ void TiledMap::loadMapSettings() {
 
 void TiledMap::loadTilesetSettings() {
     XMLElement *tileset_element = doc->FirstChildElement("map")->FirstChildElement("tileset");
-    std::string tileset_source = tileset_element->Attribute("source"); 
+
+    tileset = new Tileset( tileset_element, parentPath(tmxPath) );
+
+    /*std::string tileset_source = tileset_element->Attribute("source"); 
 
     XMLDocument *tilesetDocument = new XMLDocument;
 
@@ -116,7 +121,8 @@ void TiledMap::loadTilesetSettings() {
     tileset.width = image_element->IntAttribute("width");
     tileset.height = image_element->IntAttribute("height");
 
-    delete tilesetDocument;
+    delete tilesetDocument; 
+    */
 }
 
 void TiledMap::loadLayersSettings() {
@@ -126,7 +132,7 @@ void TiledMap::loadLayersSettings() {
 
 void TiledMap::loadMapUsingSettings() {
     std::string parentDirectoryPath = parentPath(tmxPath);
-    std::string tilesetPath = parentDirectoryPath + "/" + tileset.source;
+    std::string tilesetPath = tileset->getTextureFilePath();
 
     auto texture_cache = cocos2d::Director::getInstance()->getTextureCache();
     auto tileset_texture = texture_cache->addImage( tilesetPath );
@@ -149,8 +155,8 @@ void TiledMap::loadMapUsingSettings() {
 }
 
 const cocos2d::Rect TiledMap::textureRect(int gid) {
-    int width_texture_count = tileset.width / tilewidth;
-    int height_texture_count = tileset.height / tileheight;
+    int width_texture_count = tileset->getWidth() / tilewidth;
+    int height_texture_count = tileset->getHeight() / tileheight;
 
     gid--;
 

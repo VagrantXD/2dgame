@@ -43,7 +43,7 @@ bool FirstScene::init()
 
 
 
-    tm->loadVisibleArea();
+  /*  tm->loadVisibleArea();
 
     if( tm->isVisibleAreaLoading() ) {
         auto r = tm->getVisibleArea();
@@ -54,7 +54,7 @@ bool FirstScene::init()
 
         tm->setPosition( -r.origin * tm->getScale() );
     }
-
+*/
 
     auto mb = tm->getMapBody();
 
