@@ -1,8 +1,9 @@
 /* FirstScene.cpp */
 
-#include "ui/CocosGUI.h"
 #include "FirstScene.h"
-#include "tiledmap.h"
+#include "tiledmap/tiledmap.h"
+
+#include "ui/CocosGUI.h"
 
 #include <iostream>
 

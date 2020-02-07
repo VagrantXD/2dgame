@@ -4,6 +4,8 @@
 
 #include "tiledmap.h"
 
+#include "layer.h"
+
 using namespace tinyxml2;
 
 USING_NS_CC;
