@@ -22,15 +22,15 @@ bool TiledMap::loadObjects() {
         return false;
 
     while(objectgroup_element) {
-        auto object_element = objectgroup_element->FirstChildElement(); 
+        auto object_element = objectgroup_element->FirstChildElement("object"); 
 
         while(object_element) {
             objects.push_back(object_element); 
 
-            object_element = object_element->NextSiblingElement();
+            object_element = object_element->NextSiblingElement("object");
         }
          
-        objectgroup_element = objectgroup_element->NextSiblingElement();
+        objectgroup_element = objectgroup_element->NextSiblingElement("objectgroup");
     }
 
     return true;
@@ -67,7 +67,8 @@ const MapBody TiledMap::getMapBody() {
 }
 
 TiledMap::TiledMap() 
-    : visibleArea( cocos2d::Rect::ZERO )
+    : visibleArea( cocos2d::Rect::ZERO ),
+      isloading(false)
 {
 
 }
@@ -82,26 +83,38 @@ void TiledMap::initWithFileName(const std::string &tmxFileName) {
 
     doc = new tinyxml2::XMLDocument;
 
-        if( doc->LoadFile(tmxPath.c_str()) )
-            ; // исключение
+        if( doc->LoadFile(tmxPath.c_str()) ) {
+            return;  // isloading == false
+        }
 
-    loadMapSettings();
-    loadTilesetSettings();
-    loadLayersSettings();
+    if( !loadMapSettings() )
+        return;
 
-    //loadMapUsingSettings();
+    if( !loadTilesetSettings() )
+        return;
+
+    if( !loadLayersSettings() )
+        return;
+
+    isloading = true;
 }
 
-void TiledMap::loadMapSettings() {
+bool TiledMap::loadMapSettings() {
     XMLElement *map_element = doc->FirstChildElement("map");
+
+    if(map_element == nullptr) {
+        return false;
+    }
 
     width = map_element->IntAttribute("width");
     height = map_element->IntAttribute("height");
     tilewidth = map_element->IntAttribute("tilewidth");
     tileheight = map_element->IntAttribute("tileheight");
+
+    return true;
 }
 
-void TiledMap::loadTilesetSettings() {
+bool TiledMap::loadTilesetSettings() {
     XMLElement *tileset_element = doc->FirstChildElement("map")->FirstChildElement("tileset");
 
     tileset = new Tileset( tileset_element, parentPath(tmxPath) );
@@ -111,17 +124,18 @@ void TiledMap::loadTilesetSettings() {
         texturecache->addImage( tileset->getTextureFilePath() );
     }
     else {
-        ;     // Что сделать?
+        return false;     // Что сделать?
     }
+
+    return true;
 }
 
-void TiledMap::loadLayersSettings() {
+bool TiledMap::loadLayersSettings() {
     XMLElement *layer_element = doc->FirstChildElement("map")->FirstChildElement("layer");
 
     if(layer_element == nullptr) {
-        ; // Что сделать?
+        return false;
     }
-
 
     while(layer_element) {
         auto layer = Layer::create(layer_element); 
@@ -133,11 +147,13 @@ void TiledMap::loadLayersSettings() {
 
         }
         else {
-            ;    // Что сделать?
+            return false;
         }
 
-        layer_element = layer_element->NextSiblingElement();
+        layer_element = layer_element->NextSiblingElement("layer");
     }
+
+    return true;
 }
 
 std::string TiledMap::parentPath(const std::string &path) {

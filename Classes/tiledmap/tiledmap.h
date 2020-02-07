@@ -13,11 +13,13 @@ class Tileset;
 class TiledMap : public cocos2d::Node {
 
     public:
-        const cocos2d::Vec2 getMapSize() { return cocos2d::Vec2(width, height); }
-        const cocos2d::Vec2 getTileSize() { return cocos2d::Vec2(tilewidth, tileheight); }
+        const cocos2d::Vec2 getMapSize() const { return cocos2d::Vec2(width, height); }
+        const cocos2d::Vec2 getTileSize() const { return cocos2d::Vec2(tilewidth, tileheight); }
 
-        float getSizeX() { return width * tilewidth; }
-        float getSizeY() { return height * tileheight; }
+        float getSizeX() const { return width * tilewidth; }
+        float getSizeY() const { return height * tileheight; }
+
+        bool isLoading() const { return isloading; }
 
         const cocos2d::Rect getVisibleArea() { return visibleArea; }
         bool isVisibleAreaLoading() { return !visibleArea.equals( cocos2d::Rect::ZERO ); }
@@ -40,9 +42,9 @@ class TiledMap : public cocos2d::Node {
 
     private:
         // Обязательно должно быть загружено
-        void loadMapSettings();
-        void loadTilesetSettings();
-        void loadLayersSettings();
+        bool loadMapSettings();
+        bool loadTilesetSettings();
+        bool loadLayersSettings();
 
         // методы для работы с файловыми путями
         std::string parentPath(const std::string &path);
@@ -58,6 +60,8 @@ class TiledMap : public cocos2d::Node {
         int tileheight;
 
         cocos2d::Rect visibleArea;
+
+        bool isloading;
  
     private:     // Для внутреннего использования
 

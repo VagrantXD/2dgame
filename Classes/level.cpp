@@ -1,5 +1,7 @@
 /* level.cpp */
 
+#include <iostream>
+
 #include "level.h"
 #include "tiledmap/tiledmap.h"
 
@@ -22,6 +24,13 @@ bool Level::init() {
     }
 
     map = TiledMap::create("map3/map.tmx");
+
+    if( !map->isLoading() ) {
+        std::cout << std::endl << "Map not loading!!!" << std::endl;
+        return false;
+    }
+
+    map->loadObjects();
     
     addChild(map);
 
