@@ -15,14 +15,13 @@ class MapBody {
         const cocos2d::Vec2 *getPolygon() const { return points; }
 
     public:
-        MapBody(tinyxml2::XMLElement *mapbody_element);
+        MapBody(tinyxml2::XMLElement *mapbody_element, float ySize);
         ~MapBody();
 
-        void transformMapBody(int mapHeight);
-
     private:
-        void loadMapBody(tinyxml2::XMLElement *mapbody_element);
+        void loadMapBody(tinyxml2::XMLElement *mapbody_element, float ySize);
         void polygonParse(const std::string &polygonStr);
+        void transformMapBody(float ySize);
 
     private:
         cocos2d::Vec2 *points;

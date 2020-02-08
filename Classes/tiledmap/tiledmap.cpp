@@ -2,10 +2,11 @@
 
 #include <iostream>
 
-#include "tiledmap.h"
 #include "layer.h"
 #include "tileset.h"
+#include "visiblearea.h"
 
+#include "tiledmap.h"
 
 using namespace tinyxml2;
 
@@ -16,59 +17,27 @@ TiledMap *TiledMap::create(const std::string &tmxFileName) {
     return ret;
 }
 
-bool TiledMap::loadObjects() {
-    auto objectgroup_element = doc->FirstChildElement("map")->FirstChildElement("objectgroup");;
-    if(!objectgroup_element) 
-        return false;
 
-    while(objectgroup_element) {
-        auto object_element = objectgroup_element->FirstChildElement("object"); 
-
-        while(object_element) {
-            objects.push_back(object_element); 
-
-            object_element = object_element->NextSiblingElement("object");
-        }
-         
-        objectgroup_element = objectgroup_element->NextSiblingElement("objectgroup");
-    }
-
-    return true;
-}
-
-bool TiledMap::loadVisibleArea() {
+const VisibleArea *TiledMap::loadVisibleArea() {
     XMLElement *visiblearea_element = findObject("visible_area");
 
-    if(visiblearea_element == nullptr)
-        return false;
+    visibleArea = new VisibleArea( visiblearea_element, getSizeY() );
 
-    float x = visiblearea_element->DoubleAttribute("x");
-    float y = visiblearea_element->DoubleAttribute("y");
-    float width = visiblearea_element->DoubleAttribute("width");
-    float height = visiblearea_element->DoubleAttribute("height");
-
-    float transformY = getSizeY() - (height + y);
-
-    visibleArea.setRect(x, transformY, width, height);
-
-    if( visibleArea.equals( cocos2d::Rect::ZERO ) )
-        return false;
-
-    return true;
+    return visibleArea;
 }
 
-const MapBody TiledMap::getMapBody() {
+const MapBody *TiledMap::loadMapBody() {
     XMLElement *mapbody_element = findObject("map_body");
 
-    MapBody mb(mapbody_element);
-    mb.transformMapBody( getSizeY() );
+    mapBody = new MapBody( mapbody_element, getSizeY() );
 
-    return mb;
+    return mapBody;
 }
 
 TiledMap::TiledMap() 
-    : visibleArea( cocos2d::Rect::ZERO ),
-      isloading(false)
+    : visibleArea( nullptr ),
+      mapBody( nullptr ), 
+      isloading( false )
 {
 
 }
@@ -76,6 +45,8 @@ TiledMap::TiledMap()
 TiledMap::~TiledMap() {
     delete doc;
     delete tileset;
+    delete mapBody;
+    delete visibleArea;
 }
 
 void TiledMap::initWithFileName(const std::string &tmxFileName) {
@@ -95,6 +66,8 @@ void TiledMap::initWithFileName(const std::string &tmxFileName) {
 
     if( !loadLayersSettings() )
         return;
+
+    loadObjects();
 
     isloading = true;
 }
@@ -151,6 +124,26 @@ bool TiledMap::loadLayersSettings() {
         }
 
         layer_element = layer_element->NextSiblingElement("layer");
+    }
+
+    return true;
+}
+
+bool TiledMap::loadObjects() {
+    auto objectgroup_element = doc->FirstChildElement("map")->FirstChildElement("objectgroup");;
+    if(!objectgroup_element) 
+        return false;
+
+    while(objectgroup_element) {
+        auto object_element = objectgroup_element->FirstChildElement("object"); 
+
+        while(object_element) {
+            objects.push_back(object_element); 
+
+            object_element = object_element->NextSiblingElement("object");
+        }
+         
+        objectgroup_element = objectgroup_element->NextSiblingElement("objectgroup");
     }
 
     return true;

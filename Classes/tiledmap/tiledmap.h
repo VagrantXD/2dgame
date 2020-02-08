@@ -9,6 +9,7 @@
 
 class Layer;
 class Tileset;
+class VisibleArea;
 
 class TiledMap : public cocos2d::Node {
 
@@ -21,18 +22,14 @@ class TiledMap : public cocos2d::Node {
 
         bool isLoading() const { return isloading; }
 
-        const cocos2d::Rect getVisibleArea() { return visibleArea; }
-        bool isVisibleAreaLoading() { return !visibleArea.equals( cocos2d::Rect::ZERO ); }
-        
-        const MapBody getMapBody();
+        const MapBody *getMapBody() const { return mapBody; }
+        const VisibleArea *getVisibleArea() const { return visibleArea; }
         
     public:
         static TiledMap *create(const std::string &tmxFileName);
 
-        // Дополнительные загружаемые параметры
-        //
-        bool loadObjects();
-        bool loadVisibleArea();
+        const VisibleArea *loadVisibleArea();
+        const MapBody *loadMapBody();
 
 
     private:
@@ -45,6 +42,9 @@ class TiledMap : public cocos2d::Node {
         bool loadMapSettings();
         bool loadTilesetSettings();
         bool loadLayersSettings();
+
+        // Не обязательно должно присутствовать, наличие конкретных объектов проверяется в самих этих объектах
+        bool loadObjects();
 
         // методы для работы с файловыми путями
         std::string parentPath(const std::string &path);
@@ -59,7 +59,8 @@ class TiledMap : public cocos2d::Node {
         int tilewidth;
         int tileheight;
 
-        cocos2d::Rect visibleArea;
+        MapBody *mapBody;
+        VisibleArea *visibleArea;
 
         bool isloading;
  

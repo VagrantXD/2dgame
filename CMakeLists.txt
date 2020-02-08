@@ -62,6 +62,7 @@ list(APPEND GAME_SOURCE
      Classes/tiledmap/layer.cpp
      Classes/tiledmap/tileset.cpp
      Classes/tiledmap/mapbody.cpp
+     Classes/tiledmap/visiblearea.cpp
      Classes/tinyxml2/tinyxml2.cpp
      )
 list(APPEND GAME_HEADER
@@ -71,6 +72,7 @@ list(APPEND GAME_HEADER
      Classes/tiledmap/layer.h
      Classes/tiledmap/tileset.h
      Classes/tiledmap/mapbody.h
+     Classes/tiledmap/visiblearea.h
      Classes/tinyxml2/tinyxml2.h
      )
 

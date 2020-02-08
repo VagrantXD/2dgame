@@ -6,39 +6,21 @@
 
 namespace xml = tinyxml2;
 
-MapBody::MapBody(xml::XMLElement *mapbody_element) 
+MapBody::MapBody(xml::XMLElement *mapbody_element, float ySize) 
     :points(nullptr),
      size(0), 
      xOffset(0.0f),
      yOffset(0.0f),
      isloading(false)
 {
-    loadMapBody(mapbody_element);
+    loadMapBody(mapbody_element, ySize);
 }
 
 MapBody::~MapBody() {
     delete [] points;
 }
 
-void MapBody::transformMapBody(int mapHeight) {
-    float height = 0.0f; 
-
-    if(!isLoading()) return;
-
-    for(int i = 0; i < size; ++i) {
-        if(points[i].y > height) {
-            height = points[i].y;
-        }
-    }
-
-    yOffset = mapHeight - yOffset - height;
-
-    for(int i = 0; i < size; ++i) {
-      points[i].y = height - points[i].y;
-    }
-}
-
-void MapBody::loadMapBody(xml::XMLElement *mapbody_element) {
+void MapBody::loadMapBody(xml::XMLElement *mapbody_element, float ySize) {
     if(mapbody_element == nullptr) {
         isloading = false;
         return;
@@ -59,6 +41,8 @@ void MapBody::loadMapBody(xml::XMLElement *mapbody_element) {
     std::string polygonStr = mapbody_element->Attribute("points");
      
     polygonParse(polygonStr);
+    transformMapBody(ySize);
+
     isloading = true;
 }
 
@@ -84,3 +68,20 @@ void MapBody::polygonParse(const std::string &polygonStr) {
         else
             points[i / 2].y = n[i];
 }
+
+void MapBody::transformMapBody(float ySize) {
+    float height = 0.0f; 
+
+    for(int i = 0; i < size; ++i) {
+        if(points[i].y > height) {
+            height = points[i].y;
+        }
+    }
+
+    yOffset = ySize - yOffset - height;
+
+    for(int i = 0; i < size; ++i) {
+      points[i].y = height - points[i].y;
+    }
+}
+
