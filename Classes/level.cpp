@@ -26,7 +26,7 @@ bool Level::init() {
     map = TiledMap::create("map3/map.tmx");
 
     if( !map->isLoading() ) {
-        std::cout << std::endl << "Map not loading!!!" << std::endl;
+        cocos2d::log("Map not loading!!!");
         return false;
     }
 
